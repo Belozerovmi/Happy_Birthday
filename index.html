@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>С Днём Рождения! 🎉</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- ================= ОНБОРДИНГ ================= -->
+    <div class="onboarding" id="onboarding">
+      <div class="onboarding__content">
+        <h2>Как пользоваться</h2>
+        <div class="onboarding__row">
+          <svg
+            class="onboarding__icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M19 12H5M12 19l-7-7 7-7" />
+          </svg>
+          <p>Свайп влево — следующий</p>
+        </div>
+        <div class="onboarding__row">
+          <svg
+            class="onboarding__icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
+          <p>Свайп вправо — предыдущий</p>
+        </div>
+        <div class="onboarding__row">
+          <svg
+            class="onboarding__icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polygon points="5 3 19 12 5 21 5 3" />
+          </svg>
+          <p>Нажмите Play, чтобы услышать поздравление</p>
+        </div>
+        <button class="onboarding__btn" id="onboardingBtn">Начать</button>
+      </div>
+    </div>
+
+    <!-- ================= КАРТОЧКИ ================= -->
+    <main class="deck" id="deck"></main>
+
+    <!-- ================= ФИНАЛ ================= -->
+    <div class="finish" id="finish">
+      <h1>С Днём Рождения! 🎂</h1>
+      <p>Ты — лучшая ❤️</p>
+      <button id="restartBtn">Послушать ещё раз</button>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
