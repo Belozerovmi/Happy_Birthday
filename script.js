@@ -33,6 +33,24 @@ const PEOPLE = [
     audio: "assets/audio/Наталья Бигун.mp3",
   },
 ];
+
+/* ============================================================
+   ⬇️⬇️⬇️  ФОТО ДЛЯ ФИНАЛЬНОГО КОЛЛАЖА  ⬇️⬇️⬇️
+   ------------------------------------------------------------
+   Ровно 10 путей — раскладка будет 2 колонки × 5 строк.
+   ============================================================ */
+const FINAL_PHOTOS = [
+  "assets/photos/Natali_1.jpg",
+  "assets/photos/Natali_2.jpg",
+  "assets/photos/Natali_3.jpg",
+  "assets/photos/Natali_4.jpg",
+  "assets/photos/Natali_5.jpg",
+  "assets/photos/Natali_6.jpg",
+  "assets/photos/Natali_7.jpg",
+  "assets/photos/Natali_8.jpg",
+  "assets/photos/Natali_9.jpg",
+  "assets/photos/Natali_10.jpg",
+];
 /* ============================================================
    ⬆️⬆️⬆️  КОНЕЦ РЕДАКТИРУЕМОГО БЛОКА  ⬆️⬆️⬆️
    ============================================================ */
@@ -43,9 +61,9 @@ const onboardingBtn = document.getElementById("onboardingBtn");
 const finishEl = document.getElementById("finish");
 const restartBtn = document.getElementById("restartBtn");
 
-const AUTO_NEXT_DELAY = 3000;
-const SWIPE_THRESHOLD = 90; // минимальный сдвиг для зачёта свайпа
-const ANIM_DURATION = 420; // мс — длительность анимации переезда
+const AUTO_NEXT_DELAY = 500;
+const SWIPE_THRESHOLD = 90;
+const ANIM_DURATION = 420;
 
 let currentIndex = 0;
 let autoNextTimer = null;
@@ -79,25 +97,15 @@ function createCard(person, index) {
         <div class="player__progress-fill"></div>
       </div>
       <div class="player__row">
-        
         <span class="player__time player__time--current">0:00</span>
-           <span class="player__spacer"></span>
+        <span class="player__spacer"></span>
         <button class="player__btn" data-role="toggle">${SVG.play}</button>
         <span class="player__spacer"></span>
-        
         <span class="player__time player__time--total">0:00</span>
-        
-        
       </div>
     </div>
     <audio src="${person.audio}" preload="metadata"></audio>
   `;
-
-  // <div class="player__speed">
-  //         <button data-speed="1" class="active">1x</button>
-  //         <button data-speed="1.5">1.5x</button>
-  //         <button data-speed="2">2x</button>
-  //       </div>
 
   const audio = card.querySelector("audio");
   const toggleBtn = card.querySelector('[data-role="toggle"]');
@@ -105,7 +113,6 @@ function createCard(person, index) {
   const progressEl = card.querySelector(".player__progress");
   const timeCur = card.querySelector(".player__time--current");
   const timeTotal = card.querySelector(".player__time--total");
-  const speedBtns = card.querySelectorAll(".player__speed button");
 
   audio.addEventListener("loadedmetadata", () => {
     timeTotal.textContent = fmt(audio.duration);
@@ -149,41 +156,15 @@ function createCard(person, index) {
     if (audio.duration) audio.currentTime = ratio * audio.duration;
   });
 
-  speedBtns.forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const speed = parseFloat(btn.dataset.speed);
-      audio.playbackRate = speed;
-      speedBtns.forEach((b) => b.classList.toggle("active", b === btn));
-    });
-  });
-
   return card;
 }
 
-/* ================================================================
-   Позиционирование карточек
-   ----------------------------------------------------------------
-   Все карточки абсолютно спозиционированы в центре контейнера,
-   а через transform мы сдвигаем их:
-     offset = 0  → в центре
-     offset > 0  → справа (следующие)
-     offset < 0  → слева  (предыдущие)
-   ================================================================ */
-
-// На сколько пикселей вбок уходит следующая "заэкранная" карточка
+/* ================= Позиционирование карточек ================= */
 function offscreenOffset() {
   return window.innerWidth + 80;
 }
 
-/**
- * Устанавливает позицию карточки.
- * @param {HTMLElement} card
- * @param {number} offset  — 0 = центр, +N = справа, -N = слева
- * @param {boolean} animate — анимировать ли
- */
 function setCardPosition(card, offset, animate = false) {
-  const cardEl = card;
   const w = offscreenOffset();
 
   let x, scale, opacity, rotate;
@@ -194,33 +175,29 @@ function setCardPosition(card, offset, animate = false) {
     opacity = 1;
     rotate = 0;
   } else {
-    // Все ненулевые оффсеты — строго за экраном
     x = offset > 0 ? w : -w;
     scale = 0.9;
-    opacity = 1; // пусть будет видно, когда выезжает
-    rotate = offset > 0 ? 8 : -8; // лёгкий наклон для «ромашки»
+    opacity = 1;
+    rotate = offset > 0 ? 8 : -8;
   }
 
   if (animate) {
-    cardEl.style.transition = `transform ${ANIM_DURATION}ms cubic-bezier(.22,.61,.36,1), opacity ${ANIM_DURATION}ms`;
+    card.style.transition = `transform ${ANIM_DURATION}ms cubic-bezier(.22,.61,.36,1), opacity ${ANIM_DURATION}ms`;
   } else {
-    cardEl.style.transition = "none";
+    card.style.transition = "none";
   }
 
-  cardEl.style.transform = `translate3d(${x}px, 0, 0) scale(${scale}) rotate(${rotate}deg)`;
-  cardEl.style.opacity = opacity;
-
-  // Скрываем с глаз те, что далеко за пределами
-  cardEl.style.pointerEvents = offset === 0 ? "auto" : "none";
+  card.style.transform = `translate3d(${x}px, 0, 0) scale(${scale}) rotate(${rotate}deg)`;
+  card.style.opacity = opacity;
+  card.style.pointerEvents = offset === 0 ? "auto" : "none";
 }
 
-/* ================= Свайпы (жёсткая траектория) ================= */
+/* ================= Свайпы ================= */
 function attachSwipe(card, index) {
   let startX = 0;
   let startY = 0;
   let curX = 0;
   let dragging = false;
-  let pointerId = null;
 
   const onStart = (e) => {
     if (isAnimating) return;
@@ -231,7 +208,6 @@ function attachSwipe(card, index) {
     startY = p.clientY;
     curX = 0;
     dragging = true;
-    pointerId = e.pointerId ?? null;
 
     card.style.transition = "none";
   };
@@ -242,10 +218,8 @@ function attachSwipe(card, index) {
     curX = p.clientX - startX;
     const dy = p.clientY - startY;
 
-    // Если движение больше вертикальное — не мешаем скроллу (тут его нет, но на будущее)
     if (Math.abs(dy) > Math.abs(curX) * 2 && Math.abs(curX) < 20) return;
 
-    // Строгая траектория: только по X. Небольшой поворот — производная от X.
     const rotate = curX / 22;
     const scale = 1 - Math.min(Math.abs(curX) / 2600, 0.04);
 
@@ -265,7 +239,6 @@ function attachSwipe(card, index) {
     } else if (swipedRight) {
       swipeTo(1);
     } else {
-      // Возврат на место
       setCardPosition(card, 0, true);
       card.style.opacity = "1";
     }
@@ -289,25 +262,28 @@ function attachSwipe(card, index) {
   });
 }
 
-/* ================================================================
-   Главный переключатель — «ромашка» со строгой траекторией
-   direction = -1  → свайп влево, вперёд
-   direction =  1  → свайп вправо, назад
-   ================================================================ */
+/* ================= Главный переключатель ================= */
 function swipeTo(direction) {
   if (isAnimating) return;
 
   const goingForward = direction === -1;
   const target = goingForward ? currentIndex + 1 : currentIndex - 1;
 
-  // Границы
   if (target < 0) {
-    // Хотим назад, но это первая — просто возвращаем на место
     const card = getCardEl(currentIndex);
     if (card) setCardPosition(card, 0, true);
     return;
   }
   if (target >= PEOPLE.length) {
+    // Сначала останавливаем текущее аудио, чтобы оно не доигрывало под финалом
+    const lastCard = getCardEl(currentIndex);
+    if (lastCard) {
+      const a = lastCard.querySelector("audio");
+      if (a) {
+        a.pause();
+        a.currentTime = 0; // сброс, чтобы при возврате не продолжало с середины
+      }
+    }
     showFinish();
     return;
   }
@@ -319,34 +295,29 @@ function swipeTo(direction) {
 
   const w = offscreenOffset();
 
-  // 1. Текущая уезжает за экран в сторону свайпа
   if (currentCard) {
     currentCard.style.transition = `transform ${ANIM_DURATION}ms cubic-bezier(.22,.61,.36,1), opacity ${ANIM_DURATION}ms`;
     currentCard.style.transform = `translate3d(${direction * (w + 60)}px, 0, 0) rotate(${direction * 20}deg) scale(0.9)`;
     currentCard.style.opacity = "0";
     currentCard.style.pointerEvents = "none";
 
-    // Пауза аудио текущей
     const a = currentCard.querySelector("audio");
     if (a) a.pause();
   }
 
-  // 2. Следующая приходит из-за противоположного края в центр
   if (nextCard) {
-    // Ставим её в стартовую позицию (за противоположным краем) без анимации
     setCardPosition(nextCard, goingForward ? 1 : -1, false);
     nextCard.style.opacity = "1";
     nextCard.style.pointerEvents = "none";
-    // Форсируем reflow, чтобы браузер применил стартовое положение
     void nextCard.offsetWidth;
 
-    // И отправляем в центр
     requestAnimationFrame(() => {
       setCardPosition(nextCard, 0, true);
     });
+
+    autoPlayCard(nextCard);
   }
 
-  // 3. Финализируем состояние
   setTimeout(() => {
     currentIndex = target;
     isAnimating = false;
@@ -354,35 +325,28 @@ function swipeTo(direction) {
   }, ANIM_DURATION);
 }
 
-/* ================= Утилиты работы с карточками ================= */
+/* ================= Утилиты ================= */
 function getCardEl(index) {
   return deckEl.querySelector(`.card[data-index="${index}"]`);
 }
 
-/**
- * Гарантированно создаёт карточку для индекса (если её нет в DOM).
- */
 function ensureCard(index) {
   if (index < 0 || index >= PEOPLE.length) return null;
   let card = getCardEl(index);
   if (!card) {
     card = createCard(PEOPLE[index], index);
     deckEl.appendChild(card);
-    // Изначально — за правым краем (если это будущая) или за левым (если прошлая)
     setCardPosition(card, index >= currentIndex ? 1 : -1, false);
     attachSwipe(card, index);
   }
   return card;
 }
 
-/* ================= Управление колодой ================= */
 function renderDeck(animateCurrent = false) {
-  // Убедимся, что текущая + соседние существуют
   ensureCard(currentIndex - 1);
   ensureCard(currentIndex);
   ensureCard(currentIndex + 1);
 
-  // Расставим корректно всех, кто есть в DOM
   const cards = deckEl.querySelectorAll(".card");
   cards.forEach((card) => {
     const i = parseInt(card.dataset.index, 10);
@@ -396,7 +360,6 @@ function renderDeck(animateCurrent = false) {
     }
   });
 
-  // Удаляем карточки, которые слишком далеко (экономия памяти и аудио)
   cards.forEach((card) => {
     const i = parseInt(card.dataset.index, 10);
     if (Math.abs(i - currentIndex) > 2) {
@@ -420,8 +383,84 @@ function pauseAllExcept(current) {
   });
 }
 
+/* ================= Автозапуск аудио ================= */
+function autoPlayCard(card) {
+  const audio = card.querySelector("audio");
+  if (!audio) return;
+
+  audio.currentTime = 0;
+  audio.playbackRate = 1;
+
+  const playPromise = audio.play();
+  if (playPromise && typeof playPromise.catch === "function") {
+    playPromise.catch(() => {});
+  }
+}
+
+/* ================================================================
+   ФИНАЛЬНЫЙ ЭКРАН — простая сетка 2 × 5 из квадратных фото.
+   Раскладку делает CSS Grid, JS только создаёт плитки и анимирует.
+   ================================================================ */
+
+/* ---------- Параметры ---------- */
+const COLLAGE_APPEAR_DELAY = 80; // пауза перед первым фото, мс
+const COLLAGE_STAGGER = 90; // интервал между появлениями, мс
+const COLLAGE_OFFSCREEN = 130; // стартовое смещение за экран, % от плитки
+
 function showFinish() {
   finishEl.classList.add("active");
+  finishEl.classList.remove("show-text");
+
+  const board = document.getElementById("finishBoard");
+  if (!board) return;
+  board.innerHTML = "";
+
+  const photos = FINAL_PHOTOS.length
+    ? FINAL_PHOTOS
+    : PEOPLE.map((p) => p.photo);
+
+  renderCollage(board, photos);
+
+  const totalDelay =
+    COLLAGE_APPEAR_DELAY + (photos.length - 1) * COLLAGE_STAGGER + 700;
+  setTimeout(() => {
+    finishEl.classList.add("show-text");
+    startCelebration(); // 🎉 конфетти + цветочки
+  }, totalDelay);
+}
+
+/* ---------- Отрисовка с въездом со стороны ---------- */
+function renderCollage(board, photos) {
+  // Сетка в CSS: 2 колонки. Значит, чётные индексы — левая колонка,
+  // нечётные — правая. Левая въезжает слева, правая — справа.
+  const COLS = 2;
+
+  photos.forEach((src, i) => {
+    const el = document.createElement("div");
+    el.className = "collage-item";
+    el.style.backgroundImage = `url('${src}')`;
+
+    const col = i % COLS;
+
+    // Левая колонка — стартует слева, правая — справа.
+    // Небольшое вертикальное разнообразие: чётные ряды сверху, нечётные снизу.
+    const row = Math.floor(i / COLS);
+    let tx = col === 0 ? -COLLAGE_OFFSCREEN : COLLAGE_OFFSCREEN;
+    let ty = row % 2 === 0 ? -15 : 15;
+
+    el.style.transform = `translate3d(${tx}%, ${ty}%, 0)`;
+    el.style.opacity = "0";
+
+    board.appendChild(el);
+
+    void el.offsetWidth;
+
+    const showAt = COLLAGE_APPEAR_DELAY + i * COLLAGE_STAGGER;
+    setTimeout(() => {
+      el.style.opacity = "1";
+      el.style.transform = "translate3d(0, 0, 0)";
+    }, showAt);
+  });
 }
 
 /* ================= Онбординг ================= */
@@ -435,7 +474,11 @@ onboardingBtn.addEventListener("click", () => {
 });
 
 restartBtn.addEventListener("click", () => {
-  finishEl.classList.remove("active");
+  stopCelebration();
+  finishEl.classList.remove("active", "show-text");
+  const board = document.getElementById("finishBoard");
+  if (board) board.innerHTML = "";
+
   currentIndex = 0;
   renderDeck();
 });
@@ -450,8 +493,204 @@ window.addEventListener("keydown", (e) => {
 /* ================= Ресайз ================= */
 window.addEventListener("resize", () => {
   renderDeck(false);
+
+  // Пересчёт канваса конфетти, если он активен
+  if (confettiCanvas && finishEl.classList.contains("active")) {
+    const dpr = window.devicePixelRatio || 1;
+    confettiCanvas.width = window.innerWidth * dpr;
+    confettiCanvas.height = window.innerHeight * dpr;
+    confettiCanvas.style.width = window.innerWidth + "px";
+    confettiCanvas.style.height = window.innerHeight + "px";
+    confettiCtx = confettiCanvas.getContext("2d");
+    confettiCtx.scale(dpr, dpr);
+  }
 });
 
 /* ================= Инициализация ================= */
 checkOnboarding();
 renderDeck();
+
+/* ================================================================
+   ПРАЗДНИЧНАЯ АНИМАЦИЯ — конфетти + цветочки
+   ================================================================ */
+
+const FLOWER_EMOJIS = [];
+
+let confettiCtx = null;
+let confettiParticles = [];
+let confettiRAF = null;
+let confettiCanvas = null;
+
+/* ---------- Запуск всей праздничной анимации ---------- */
+function startCelebration() {
+  startConfetti();
+  startFlowers();
+}
+
+/* ---------- Конфетти на canvas ---------- */
+function startConfetti() {
+  // Создаём канвас внутри .finish, если его ещё нет
+  let canvas = finishEl.querySelector(".confetti-canvas");
+  if (!canvas) {
+    canvas = document.createElement("canvas");
+    canvas.className = "confetti-canvas";
+    finishEl.appendChild(canvas);
+  }
+  confettiCanvas = canvas;
+
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = window.innerWidth * dpr;
+  canvas.height = window.innerHeight * dpr;
+  canvas.style.width = window.innerWidth + "px";
+  canvas.style.height = window.innerHeight + "px";
+
+  confettiCtx = canvas.getContext("2d");
+  confettiCtx.scale(dpr, dpr);
+
+  // Палитра
+  const colors = [
+    "#ff4d8d",
+    "#b14aff",
+    "#ffd166",
+    "#06d6a0",
+    "#4cc9f0",
+    "#f72585",
+    "#ffb703",
+    "#ffffff",
+  ];
+
+  const COUNT = 100;
+  confettiParticles = [];
+
+  for (let i = 0; i < COUNT; i++) {
+    confettiParticles.push({
+      x: Math.random() * window.innerWidth,
+      y: -Math.random() * window.innerHeight,
+      w: 6 + Math.random() * 8,
+      h: 8 + Math.random() * 12,
+      color: colors[(Math.random() * colors.length) | 0],
+      rot: Math.random() * Math.PI * 2,
+      vr: (Math.random() - 0.5) * 0.2,
+      vy: 1.5 + Math.random() * 1.0,
+      vx: (Math.random() - 0.5) * 1.2,
+      shape: Math.random() < 0.6 ? "rect" : "circle",
+      swing: Math.random() * Math.PI * 2,
+      swingSpeed: 0.02 + Math.random() * 0.2,
+    });
+  }
+
+  if (confettiRAF) cancelAnimationFrame(confettiRAF);
+
+  const tick = () => {
+    const W = window.innerWidth;
+    const H = window.innerHeight;
+    confettiCtx.clearRect(0, 0, W, H);
+
+    let alive = 0;
+
+    for (const p of confettiParticles) {
+      p.swing += p.swingSpeed;
+      p.x += p.vx + Math.sin(p.swing) * 0.8;
+      p.y += p.vy;
+      p.rot += p.vr;
+
+      // Зацикливаем — частицы бесконечно падают сверху
+      if (p.y > H + 40) {
+        p.y = -40;
+        p.x = Math.random() * W;
+      }
+
+      alive++;
+
+      confettiCtx.save();
+      confettiCtx.translate(p.x, p.y);
+      confettiCtx.rotate(p.rot);
+      confettiCtx.fillStyle = p.color;
+      confettiCtx.globalAlpha = 0.95;
+
+      if (p.shape === "rect") {
+        confettiCtx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      } else {
+        confettiCtx.beginPath();
+        confettiCtx.arc(0, 0, p.w / 2, 0, Math.PI * 2);
+        confettiCtx.fill();
+      }
+
+      confettiCtx.restore();
+    }
+
+    confettiRAF = requestAnimationFrame(tick);
+  };
+
+  tick();
+}
+
+/* ---------- Цветочки ---------- */
+function startFlowers() {
+  // Если уже что-то есть — не спамим
+  finishEl.querySelectorAll(".flower").forEach((n) => n.remove());
+
+  const W = window.innerWidth;
+
+  // Спавним 18 цветков с разными задержками
+  const TOTAL = 18;
+  for (let i = 0; i < TOTAL; i++) {
+    const flower = document.createElement("span");
+    flower.className = "flower";
+    flower.textContent =
+      FLOWER_EMOJIS[(Math.random() * FLOWER_EMOJIS.length) | 0];
+
+    // Случайная позиция по ширине (в пределах 5%–95%)
+    flower.style.left = 5 + Math.random() * (W * 0.9) + "px";
+    flower.style.fontSize = 20 + Math.random() * 20 + "px";
+
+    // Длительность падения
+    const duration = 6 + Math.random() * 5; // 6–11 сек
+    const delay = Math.random() * 3; // 0–3 сек
+    flower.style.animationDuration = duration + "s";
+    flower.style.animationDelay = delay + "s";
+
+    // Разные направления дрейфа и вращения
+    flower.style.setProperty(
+      "--drift",
+      (Math.random() * 160 - 80).toFixed(0) + "px",
+    );
+    flower.style.setProperty(
+      "--spin",
+      (Math.random() * 720 - 360).toFixed(0) + "deg",
+    );
+
+    // Некоторые цветы чуть прозрачнее
+    flower.style.opacity = (0.7 + Math.random() * 0.3).toFixed(2);
+
+    finishEl.appendChild(flower);
+
+    // Удаляем после завершения анимации, чтобы не засорять DOM
+    const lifeMs = (duration + delay) * 1000 + 500;
+    setTimeout(() => flower.remove(), lifeMs);
+  }
+
+  // Повторный запуск цветов каждые ~9 секунд, пока финал открыт
+  if (startFlowers._timer) clearTimeout(startFlowers._timer);
+  const loop = () => {
+    if (!finishEl.classList.contains("active")) return;
+    startFlowers();
+  };
+  startFlowers._timer = setTimeout(loop, 9000);
+}
+
+/* ---------- Остановка анимации при закрытии финала ---------- */
+function stopCelebration() {
+  if (confettiRAF) {
+    cancelAnimationFrame(confettiRAF);
+    confettiRAF = null;
+  }
+  if (confettiCtx) {
+    confettiCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+  }
+  if (startFlowers._timer) {
+    clearTimeout(startFlowers._timer);
+    startFlowers._timer = null;
+  }
+  finishEl.querySelectorAll(".flower").forEach((n) => n.remove());
+}
