@@ -23,12 +23,12 @@ const PEOPLE = [
     audio: "assets/audio/Муж.mp3",
   },
   {
-    name: "Ирина Краснова",
+    name: "Ира",
     photo: "assets/photos/Ирина Краснова.jpg",
     audio: "assets/audio/Ирина Краснова.mp3",
   },
   {
-    name: "Наталья Бигун",
+    name: "Наташа",
     photo: "assets/photos/Наталья Бигун.jpg",
     audio: "assets/audio/Наталья Бигун.mp3",
   },
