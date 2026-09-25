@@ -99,9 +99,9 @@ body {
   top: 50%;
   left: 50%;
   width: min(92vw, 420px);
-  height: min(80dvh, 720px);
+  height: min(90dvh, 820px);
   margin-left: calc(min(92vw, 420px) / -2);
-  margin-top: calc(min(80dvh, 720px) / -2);
+  margin-top: calc(min(90dvh, 820px) / -2);
   border-radius: 28px;
   overflow: hidden;
   background: #1a1a22;
@@ -210,13 +210,13 @@ body {
 }
 
 .player__time {
-  font-size: 13px;
+  font-size: 16px;
   color: #d5d5d5;
   font-variant-numeric: tabular-nums;
   min-width: 42px;
 }
 .player__time--current {
-  text-align: right;
+  text-align: center;
 }
 
 .player__spacer {

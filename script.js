@@ -3,19 +3,34 @@
    ============================================================ */
 const PEOPLE = [
   {
+    name: "Мама",
+    photo: "assets/photos/мама.jpg",
+    audio: "assets/audio/мама.mp3",
+  },
+  {
+    name: "Папа",
+    photo: "assets/photos/папа.jpg",
+    audio: "assets/audio/папа.mp3",
+  },
+  {
+    name: "Брат",
+    photo: "assets/photos/Крёстный.jpg",
+    audio: "assets/audio/Крёстный.mp3",
+  },
+  {
+    name: "Муж",
+    photo: "assets/photos/муж.jpg",
+    audio: "assets/audio/Муж.mp3",
+  },
+  {
     name: "Ирина Краснова",
     photo: "assets/photos/Ирина Краснова.jpg",
     audio: "assets/audio/Ирина Краснова.mp3",
   },
   {
-    name: "Имя Фамилия 2",
-    photo: "assets/photos/person2.jpg",
-    audio: "assets/audio/person2.mp3",
-  },
-  {
-    name: "Имя Фамилия 3",
-    photo: "assets/photos/person3.jpg",
-    audio: "assets/audio/person3.mp3",
+    name: "Наталья Бигун",
+    photo: "assets/photos/Наталья Бигун.jpg",
+    audio: "assets/audio/Наталья Бигун.mp3",
   },
 ];
 /* ============================================================
@@ -64,19 +79,25 @@ function createCard(person, index) {
         <div class="player__progress-fill"></div>
       </div>
       <div class="player__row">
-        <button class="player__btn" data-role="toggle">${SVG.play}</button>
+        
         <span class="player__time player__time--current">0:00</span>
+           <span class="player__spacer"></span>
+        <button class="player__btn" data-role="toggle">${SVG.play}</button>
         <span class="player__spacer"></span>
+        
         <span class="player__time player__time--total">0:00</span>
-        <div class="player__speed">
-          <button data-speed="1" class="active">1x</button>
-          <button data-speed="1.5">1.5x</button>
-          <button data-speed="2">2x</button>
-        </div>
+        
+        
       </div>
     </div>
     <audio src="${person.audio}" preload="metadata"></audio>
   `;
+
+  // <div class="player__speed">
+  //         <button data-speed="1" class="active">1x</button>
+  //         <button data-speed="1.5">1.5x</button>
+  //         <button data-speed="2">2x</button>
+  //       </div>
 
   const audio = card.querySelector("audio");
   const toggleBtn = card.querySelector('[data-role="toggle"]');
