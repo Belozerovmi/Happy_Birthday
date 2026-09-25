@@ -5,12 +5,12 @@ const PEOPLE = [
   {
     name: "Мама",
     photo: "assets/photos/мама.jpg",
-    audio: "assets/audio/мама.mp3",
+    audio: "assets/audio/мама_к.mp3",
   },
   {
     name: "Папа",
     photo: "assets/photos/папа.jpg",
-    audio: "assets/audio/папа.mp3",
+    audio: "assets/audio/папа_к.mp3",
   },
   {
     name: "Брат",
